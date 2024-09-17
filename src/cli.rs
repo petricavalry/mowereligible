@@ -9,7 +9,7 @@ pub struct Cli {
 #[derive(Subcommand)]
 pub enum Commands {
     Number(NumberArgs),
-    String(StringArgs),
+    Passphrase(PassphraseArgs),
 }
 
 #[derive(Args)]
@@ -20,10 +20,13 @@ pub struct NumberArgs {
 }
 
 #[derive(Args)]
-pub struct StringArgs {
+pub struct PassphraseArgs {
     #[arg(short, long, default_value = "6")]
     pub length: u8,
 
     #[arg(short, long, default_value = "-")]
     pub separator: String,
+
+    #[arg(short, long)]
+    pub number: bool,
 }
