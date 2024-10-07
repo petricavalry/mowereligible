@@ -29,4 +29,7 @@ pub struct PassphraseArgs {
 
     #[arg(short, long)]
     pub number: bool,
+
+    #[arg(short, long)]
+    pub uppercase: bool,
 }

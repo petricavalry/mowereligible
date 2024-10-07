@@ -61,6 +61,9 @@ where
             .choose(&mut rng)
             .expect("failed to select word from wordlist")
             .to_string();
+        if opts.uppercase {
+            word.get_mut(0..1).unwrap().make_ascii_uppercase();
+        }
         if index == number {
             word.push_str(&rng.gen_range(0..9).to_string());
         }
