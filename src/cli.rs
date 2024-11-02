@@ -32,4 +32,7 @@ pub struct PassphraseArgs {
 
     #[arg(short, long)]
     pub uppercase: bool,
+
+    #[arg(short = 'x', long)]
+    pub proxy: Option<String>,  // TODO: using specific type
 }

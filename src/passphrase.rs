@@ -7,19 +7,24 @@ use std::path::Path;
 
 const URL: &str = "https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt";
 
-async fn download_wordlist<T, P>(url: T, path: P) -> Result<String, reqwest::Error>
+async fn download_wordlist<T, P>(url: T, path: P, proxy: Option<String>) -> Result<String, reqwest::Error>
 where
     T: reqwest::IntoUrl,
     P: AsRef<Path>,
 {
-    let content = reqwest::get(url).await?.text().await?;
+    let mut builder = reqwest::Client::builder();
+    if let Some(proxy) = proxy {
+        builder = builder.proxy(reqwest::Proxy::all(proxy)?)
+    };
+    let client = builder.build().expect("failed to build client");
+    let content = client.get(url).send().await?.text().await?;
     let mut file = File::create(&path).expect("failed to create directory");
     file.write_all(content.as_bytes())
         .expect("failed to write content");
     Ok(content)
 }
 
-async fn get_wordlist<T, P>(url: T, path: P) -> Result<Vec<String>, io::Error>
+async fn get_wordlist<T, P>(url: T, path: P, proxy: Option<String>) -> Result<Vec<String>, io::Error>
 where
     T: reqwest::IntoUrl,
     P: AsRef<Path>,
@@ -27,7 +32,7 @@ where
     let content = if path.as_ref().exists() {
         fs::read_to_string(path)?
     } else {
-        download_wordlist(url, path).await.unwrap()
+        download_wordlist(url, path, proxy).await.unwrap()
     };
     let mut wordlist = Vec::new();
     for line in content.lines() {
@@ -45,7 +50,7 @@ pub async fn passphrase<P>(path: P, opts: cli::PassphraseArgs)
 where
     P: AsRef<Path>,
 {
-    let wordlist = get_wordlist(URL, path)
+    let wordlist = get_wordlist(URL, path, opts.proxy)
         .await
         .expect("failed to get wordlist from network or disk");
 
