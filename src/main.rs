@@ -16,6 +16,10 @@ async fn main() {
 
     let args = cli::Cli::parse();
 
+    if args.quiet {
+        log::set_max_level(log::LevelFilter::Error);
+    };
+
     match args.command {
         cli::Commands::Number(opts) => {
             let number = rand::thread_rng().gen_range(opts.start..opts.end);

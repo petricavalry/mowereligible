@@ -602,6 +602,7 @@ version = "0.1.0"
 dependencies = [
  "clap",
  "directories",
+ "log",
  "rand",
  "reqwest",
  "tokio",

@@ -1,4 +1,5 @@
 use crate::cli;
+use log::info;
 use rand::{seq::SliceRandom, Rng};
 use std::fs::{self, File};
 use std::io;
@@ -7,7 +8,11 @@ use std::path::Path;
 
 const URL: &str = "https://www.eff.org/files/2016/07/18/eff_large_wordlist.txt";
 
-async fn download_wordlist<T, P>(url: T, path: P, proxy: Option<String>) -> Result<String, reqwest::Error>
+async fn download_wordlist<T, P>(
+    url: T,
+    path: P,
+    proxy: Option<String>,
+) -> Result<String, reqwest::Error>
 where
     T: reqwest::IntoUrl,
     P: AsRef<Path>,
@@ -24,7 +29,11 @@ where
     Ok(content)
 }
 
-async fn get_wordlist<T, P>(url: T, path: P, proxy: Option<String>) -> Result<Vec<String>, io::Error>
+async fn get_wordlist<T, P>(
+    url: T,
+    path: P,
+    proxy: Option<String>,
+) -> Result<Vec<String>, io::Error>
 where
     T: reqwest::IntoUrl,
     P: AsRef<Path>,
@@ -32,14 +41,17 @@ where
     let content = if path.as_ref().exists() {
         fs::read_to_string(path)?
     } else {
-        download_wordlist(url, path, proxy).await.unwrap()
+        info!("EFF Large Wordlist doesn't exists, downloading.");
+        let wordlist = download_wordlist(url, path, proxy).await.unwrap();
+        info!("Download successful.");
+        wordlist
     };
     let mut wordlist = Vec::new();
     for line in content.lines() {
         wordlist.push(
             line.split_whitespace()
                 .last()
-                .expect("failed to get last word from line")
+                .expect("failed to get word from line")
                 .to_string(),
         );
     }

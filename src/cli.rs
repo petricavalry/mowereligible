@@ -4,6 +4,9 @@ use clap::{Args, Parser, Subcommand};
 pub struct Cli {
     #[command(subcommand)]
     pub command: Commands,
+
+    #[arg(short, long)]
+    pub quiet: bool,
 }
 
 #[derive(Subcommand)]
@@ -34,5 +37,5 @@ pub struct PassphraseArgs {
     pub uppercase: bool,
 
     #[arg(short = 'x', long)]
-    pub proxy: Option<String>,  // TODO: using specific type
+    pub proxy: Option<String>, // TODO: using specific type
 }
